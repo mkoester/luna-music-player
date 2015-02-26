@@ -1,0 +1,13 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Application.index
+POST    /player/play                controllers.PlayerController.playFile(filename: String)
+POST    /player/stop                controllers.PlayerController.stopPlaying()
+POST    /player/pause               controllers.PlayerController.pausePlaying()
+POST    /player/resume              controllers.PlayerController.resumePlaying()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
