@@ -9,8 +9,11 @@ lazy val player = (project in file("player")).
   settings(
     name := "luna-player",
     libraryDependencies ++= Seq(
-      "com.googlecode.soundlibs" % "mp3spi" % "1.9.5-1",
-      "com.typesafe.akka" %% "akka-actor" % "2.3.9"
+      "com.googlecode.soundlibs" %  "mp3spi"          % "1.9.5-1",
+      "org.jogamp.joal"          %  "joal-main"       % "2.2.4",
+      "org.jogamp.gluegen"       %  "gluegen-rt-main" % "2.2.4",
+      "org.jogamp.jogl"          %  "jogl-all-main"   % "2.2.4",
+      "com.typesafe.akka"        %% "akka-actor"      % "2.3.9"
     )
   )
 
