@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit
 import javax.sound.sampled._
 
 import akka.actor.{Props, Cancellable, Actor}
-import de.mirkokoester.luna.player.PlayerResponses
 
 import scala.concurrent.duration._
 
@@ -148,7 +147,7 @@ class PlayerActor extends Actor {
       if (lineAndAudioSourceAvailable()) {
         if (line.available() > bufferSize) play()
       } else {
-        cancelPlaySchedule
+        cancelPlaySchedule()
         // TODO manage situation
       }
 
