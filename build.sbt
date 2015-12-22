@@ -10,7 +10,9 @@ lazy val player = (project in file("player")).
     name := "luna-player",
     libraryDependencies ++= Seq(
       "com.googlecode.soundlibs" % "mp3spi" % "1.9.5-1",
-      "com.typesafe.akka" %% "akka-actor" % "2.3.12"
+      "com.typesafe.akka" %% "akka-actor" % "2.3.14",
+      "com.typesafe.slick" %% "slick" % "3.1.1",
+      "ch.qos.logback" % "logback-classic" % "1.1.3"
     )
   )
 
