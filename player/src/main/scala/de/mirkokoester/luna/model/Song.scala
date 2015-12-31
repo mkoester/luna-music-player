@@ -10,10 +10,10 @@ import scala.util.control.NonFatal
 case class Song(path: String, albumArtist: Option[String], artist: Option[String],
                 title: Option[String], composer: Option[String], album: Option[String], discNo: Option[Int],
                 discTotal: Option[Int], genre: Option[String], comment: Option[String], language: Option[String],
-                track: Option[Int], trackTotal: Option[Int], year: Option[Int], idOpt: Option[Int] = None)
+                track: Option[Int], trackTotal: Option[Int], year: Option[Int], duration: Int, idOpt: Option[Int] = None)
 
 object Song {
-  private def toStringOption(s: String): Option[String] = if (s.nonEmpty) Some(s) else None
+  private def toStringOption(s: String): Option[String] = if (null != s && s.nonEmpty) Some(s) else None
   private def toIntOption(s: String):    Option[Int] = try { Some(s.toInt) } catch { case NonFatal(e) => None }
 
   def fromPath(path: String): Song = {
@@ -35,6 +35,7 @@ object Song {
     val trackField       = tag.getFirst(FieldKey.TRACK)
     val trackTotalField  = tag.getFirst(FieldKey.TRACK_TOTAL)
     val yearField        = tag.getFirst(FieldKey.YEAR)
+    val duration         = audioHeader.getTrackLength
 
     Song(
       file.getAbsolutePath,
@@ -50,7 +51,17 @@ object Song {
       toStringOption(langField),
       toIntOption(trackField),
       toIntOption(trackTotalField),
-      toIntOption(yearField)
+      toIntOption(yearField),
+      duration
     )
   }
+}
+
+class SongTableRepresentation(val song: Song) {
+  def getTitle: String = song.artist.getOrElse("") + " - " + song.title.getOrElse("")
+  def getDuration: String = song.duration.toString
+}
+
+object SongTableRepresentation {
+  def apply(song: Song) = new SongTableRepresentation(song)
 }

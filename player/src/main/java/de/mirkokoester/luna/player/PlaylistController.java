@@ -1,12 +1,15 @@
 package de.mirkokoester.luna.player;
 
 import de.mirkokoester.luna.model.Song;
+import de.mirkokoester.luna.model.SongTableRepresentation;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ListView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -15,23 +18,34 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class PlaylistController implements Initializable {
-    @FXML private ListView playListView;
+    @FXML private TableView<SongTableRepresentation> playlistTableview;
     private Stage playlistStage;
-    private ObservableList<Song> items = FXCollections.observableArrayList (
-            Song.fromPath("/home/mk/Music/Foo Fighters - In Your Honor   (CD2)/Foo Fighters - Cold Day In The Sun.mp3"),
-            Song.fromPath("/home/mk/Music/Dido - Life For Rent/Dido - White Flag.mp3"),
-            Song.fromPath("/home/mk/Music/Intergalactic Lovers - Little Heavy Burdens/Intergalactic Lovers - No Regrets.mp3"),
-            Song.fromPath("/home/mk/Music/Dido - Safe Trip Home/Dido - Grafton Street.mp3")
+    private ObservableList<SongTableRepresentation> items = FXCollections.observableArrayList (
+            new SongTableRepresentation(Song.fromPath("/home/mk/Music/Foo Fighters - In Your Honor   (CD2)/Foo Fighters - Cold Day In The Sun.mp3")),
+            new SongTableRepresentation(Song.fromPath("/home/mk/Music/Dido - Life For Rent/Dido - White Flag.mp3")),
+            new SongTableRepresentation(Song.fromPath("/home/mk/Music/Intergalactic Lovers - Little Heavy Burdens/Intergalactic Lovers - No Regrets.mp3")),
+            new SongTableRepresentation(Song.fromPath("/home/mk/Music/Dido - Safe Trip Home/Dido - Grafton Street.mp3"))
     );
     private PlayerController playerController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        playListView.setItems(items);
-        playListView.setOnMouseClicked(click -> {
+        TableColumn trackCol    = new TableColumn("track");
+        TableColumn durationCol = new TableColumn("duration");
+        playlistTableview.getColumns().addAll(trackCol, durationCol);
+
+        trackCol.setCellValueFactory(
+                new PropertyValueFactory<SongTableRepresentation,String>("title")
+        );
+        durationCol.setCellValueFactory(
+                new PropertyValueFactory<SongTableRepresentation,String>("duration")
+        );
+
+        playlistTableview.setItems(items);
+        playlistTableview.setOnMouseClicked(click -> {
             if (click.getClickCount() == 2) {
-                Song currentItemSelected = (Song) playListView.getSelectionModel().getSelectedItem();
-                playerController.startPlayingFile(currentItemSelected.path());
+                SongTableRepresentation currentItemSelected = (SongTableRepresentation) playlistTableview.getSelectionModel().getSelectedItem();
+                playerController.startPlayingFile(currentItemSelected.song().path());
             }
         });
     }
@@ -63,7 +77,7 @@ public class PlaylistController implements Initializable {
         fileChooser.setTitle("Open Resource File");
         File file = fileChooser.showOpenDialog(null);
         if (null != file) {
-            items.add(Song.fromPath(file.toString()));
+            items.add(new SongTableRepresentation(Song.fromPath(file.toString())));
         }
     }
 }
