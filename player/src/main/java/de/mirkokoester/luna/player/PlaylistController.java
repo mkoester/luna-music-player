@@ -45,7 +45,7 @@ public class PlaylistController implements Initializable {
         playlistTableview.setOnMouseClicked(click -> {
             if (click.getClickCount() == 2) {
                 SongTableRepresentation currentItemSelected = (SongTableRepresentation) playlistTableview.getSelectionModel().getSelectedItem();
-                playerController.startPlayingFile(currentItemSelected.song().path());
+                playerController.startPlayingFile(currentItemSelected.song());
             }
         });
     }

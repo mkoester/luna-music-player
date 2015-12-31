@@ -29,6 +29,11 @@
     <center>
         <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
                     prefHeight="400.0" prefWidth="600.0">
+            <center>
+                <HBox prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <Label fx:id="playingTitle"/>
+                </HBox>
+            </center>
             <bottom>
                 <HBox prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                     <Slider  fx:id="timeSlider"/>

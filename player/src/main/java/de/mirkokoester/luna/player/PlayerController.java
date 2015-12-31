@@ -1,5 +1,6 @@
 package de.mirkokoester.luna.player;
 
+import de.mirkokoester.luna.model.Song;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,6 +24,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PlayerController implements Initializable {
+    @FXML private Label playingTitle;
     @FXML private Slider volumeSlider;
     @FXML private Label volumeLabel;
     @FXML private Slider timeSlider;
@@ -86,8 +88,8 @@ public class PlayerController implements Initializable {
 
     }
 
-    private void playFile(String path) {
-        File file = new File(path);
+    private void playFile(Song song) {
+        File file = new File(song.path());
         try {
             Media media = new Media(file.toURI().toURL().toString());
             mediaPlayer = new MediaPlayer(media);
@@ -112,25 +114,28 @@ public class PlayerController implements Initializable {
                 isPlaying.set(false);
             });
 
+            if (null != playingTitle) {
+                playingTitle.setText(song.getRepresentation());
+            }
             mediaPlayer.play();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
     }
 
-    protected void startPlayingFile(String path) {
+    protected void startPlayingFile(Song song) {
         if (null == mediaPlayer) {
-            playFile(path);
+            playFile(song);
         } else {
             mediaPlayer.stop();
             mediaPlayer.dispose();
-            playFile(path);
+            playFile(song);
         }
     }
 
     public void playPause(ActionEvent actionEvent) {
         if (null == mediaPlayer) {
-            startPlayingFile(MEDIA_URL);
+            startPlayingFile(Song.fromPath(MEDIA_URL));
         } else {
             if (isPlaying.get()) {
                 mediaPlayer.pause();

@@ -10,7 +10,9 @@ import scala.util.control.NonFatal
 case class Song(path: String, albumArtist: Option[String], artist: Option[String],
                 title: Option[String], composer: Option[String], album: Option[String], discNo: Option[Int],
                 discTotal: Option[Int], genre: Option[String], comment: Option[String], language: Option[String],
-                track: Option[Int], trackTotal: Option[Int], year: Option[Int], duration: Int, idOpt: Option[Int] = None)
+                track: Option[Int], trackTotal: Option[Int], year: Option[Int], duration: Int, idOpt: Option[Int] = None) {
+  def getRepresentation: String = artist.getOrElse("") + " - " + title.getOrElse("") // TODO make it customizable by the user
+}
 
 object Song {
   private def toStringOption(s: String): Option[String] = if (null != s && s.nonEmpty) Some(s) else None
@@ -58,7 +60,7 @@ object Song {
 }
 
 class SongTableRepresentation(val song: Song) {
-  def getTitle: String = song.artist.getOrElse("") + " - " + song.title.getOrElse("")
+  def getTitle: String = song.getRepresentation
   def getDuration: String = song.duration.toString
 }
 
