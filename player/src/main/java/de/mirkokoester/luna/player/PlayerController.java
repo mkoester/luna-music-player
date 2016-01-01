@@ -76,7 +76,7 @@ public class PlayerController implements Initializable {
 
         if (null != volumeSlider) {
             volumeSlider.valueProperty().addListener(ov -> {
-                if (volumeSlider.isValueChanging()) {
+                if (volumeSlider.isValueChanging() && null != mediaPlayer) {
                     mediaPlayer.setVolume(volumeSlider.getValue() / 100.0);
                     updateValues();
                 }
