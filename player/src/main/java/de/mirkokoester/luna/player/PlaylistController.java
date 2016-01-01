@@ -2,16 +2,20 @@ package de.mirkokoester.luna.player;
 
 import de.mirkokoester.luna.model.Song;
 import de.mirkokoester.luna.model.SongTableRepresentation;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import java.io.File;
 import java.net.URL;
@@ -30,9 +34,35 @@ public class PlaylistController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // row number code borrowed from http://stackoverflow.com/a/16407347
+        TableColumn numberCol = new TableColumn("#");
+        numberCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<SongTableRepresentation, SongTableRepresentation>, ObservableValue<SongTableRepresentation>>() {
+            @Override public ObservableValue<SongTableRepresentation> call(TableColumn.CellDataFeatures<SongTableRepresentation, SongTableRepresentation> p) {
+                return new ReadOnlyObjectWrapper(p.getValue());
+            }
+        });
+
+        numberCol.setCellFactory(new Callback<TableColumn<SongTableRepresentation, SongTableRepresentation>, TableCell<SongTableRepresentation, SongTableRepresentation>>() {
+            @Override public TableCell<SongTableRepresentation, SongTableRepresentation> call(TableColumn<SongTableRepresentation, SongTableRepresentation> param) {
+                return new TableCell<SongTableRepresentation, SongTableRepresentation>() {
+                    @Override protected void updateItem(SongTableRepresentation item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        if (this.getTableRow() != null && item != null) {
+                            setText(this.getTableRow().getIndex()+1+"");
+                        } else {
+                            setText("");
+                        }
+                    }
+                };
+            }
+        });
+        numberCol.setSortable(false);
+
         TableColumn trackCol    = new TableColumn("track");
         TableColumn durationCol = new TableColumn("duration");
-        playlistTableview.getColumns().addAll(trackCol, durationCol);
+
+        playlistTableview.getColumns().addAll(numberCol, trackCol, durationCol);
 
         trackCol.setCellValueFactory(
                 new PropertyValueFactory<SongTableRepresentation,String>("title")
