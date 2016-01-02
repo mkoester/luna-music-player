@@ -1,4 +1,4 @@
-package de.mirkokoester.luna.model
+package de.mirkokoester.luna.player.model
 
 import java.io.File
 

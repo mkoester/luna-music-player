@@ -1,8 +1,8 @@
 package de.mirkokoester.luna.player;
 
-import de.mirkokoester.luna.model.Player;
-import de.mirkokoester.luna.model.Song;
-import de.mirkokoester.luna.model.SongTableRepresentation;
+import de.mirkokoester.luna.player.model.Player;
+import de.mirkokoester.luna.player.model.Song;
+import de.mirkokoester.luna.player.model.SongTableRepresentation;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
