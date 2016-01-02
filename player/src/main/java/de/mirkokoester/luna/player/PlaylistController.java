@@ -1,11 +1,10 @@
 package de.mirkokoester.luna.player;
 
+import de.mirkokoester.luna.model.Player;
 import de.mirkokoester.luna.model.Song;
 import de.mirkokoester.luna.model.SongTableRepresentation;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -22,15 +21,10 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class PlaylistController implements Initializable {
-    @FXML private TableView<SongTableRepresentation> playlistTableview;
+    @FXML private TableView<SongTableRepresentation> playlistTableView;
     private Stage playlistStage;
-    private ObservableList<SongTableRepresentation> items = FXCollections.observableArrayList (
-            new SongTableRepresentation(Song.fromPath("/home/mk/Music/Foo Fighters - In Your Honor   (CD2)/Foo Fighters - Cold Day In The Sun.mp3")),
-            new SongTableRepresentation(Song.fromPath("/home/mk/Music/Dido - Life For Rent/Dido - White Flag.mp3")),
-            new SongTableRepresentation(Song.fromPath("/home/mk/Music/Intergalactic Lovers - Little Heavy Burdens/Intergalactic Lovers - No Regrets.mp3")),
-            new SongTableRepresentation(Song.fromPath("/home/mk/Music/Dido - Safe Trip Home/Dido - Grafton Street.mp3"))
-    );
     private PlayerController playerController;
+    private Player playerModel;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -62,7 +56,7 @@ public class PlaylistController implements Initializable {
         TableColumn trackCol    = new TableColumn("track");
         TableColumn durationCol = new TableColumn("duration");
 
-        playlistTableview.getColumns().addAll(numberCol, trackCol, durationCol);
+        playlistTableView.getColumns().addAll(numberCol, trackCol, durationCol);
 
         trackCol.setCellValueFactory(
                 new PropertyValueFactory<SongTableRepresentation,String>("title")
@@ -71,19 +65,26 @@ public class PlaylistController implements Initializable {
                 new PropertyValueFactory<SongTableRepresentation,String>("duration")
         );
 
-        playlistTableview.setItems(items);
-        playlistTableview.setOnMouseClicked(click -> {
+        playlistTableView.setOnMouseClicked(click -> {
             if (click.getClickCount() == 2) {
-                SongTableRepresentation currentItemSelected = (SongTableRepresentation) playlistTableview.getSelectionModel().getSelectedItem();
-                playerController.startPlayingFile(currentItemSelected.song());
+                SongTableRepresentation currentItemSelected = (SongTableRepresentation) playlistTableView.getSelectionModel().getSelectedItem();
+                if (null != currentItemSelected) {
+                    int index = playerModel.items().indexOf(currentItemSelected);
+                    if (index >= 0) {
+                        playerModel.currentlyPlaying().set(index);
+                        playerController.startPlayingFile(currentItemSelected.song());
+                    }
+                }
             }
         });
     }
 
-    protected boolean registerPlayerControllerAndStage(PlayerController playerController, Stage playlistStage) {
-        if (null == this.playerController && null == this.playlistStage) {
+    protected boolean registerPlayerControllerAndStageAndPlayerModel(PlayerController playerController, Stage playlistStage, Player playerModel) {
+        if (null == this.playerController && null == this.playlistStage && null == this.playerModel) {
             this.playerController = playerController;
             this.playlistStage = playlistStage;
+            this.playerModel = playerModel;
+            playlistTableView.setItems(this.playerModel.items());
             return true;
         } else {
             return false;
@@ -107,7 +108,7 @@ public class PlaylistController implements Initializable {
         fileChooser.setTitle("Open Resource File");
         File file = fileChooser.showOpenDialog(null);
         if (null != file) {
-            items.add(new SongTableRepresentation(Song.fromPath(file.toString())));
+            playerModel.items().add(new SongTableRepresentation(Song.fromPath(file.toString())));
         }
     }
 }

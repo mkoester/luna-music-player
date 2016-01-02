@@ -1,6 +1,8 @@
 package de.mirkokoester.luna.player;
 
+import de.mirkokoester.luna.model.Player;
 import de.mirkokoester.luna.model.Song;
+import de.mirkokoester.luna.model.SongTableRepresentation;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -31,10 +33,13 @@ public class PlayerController implements Initializable {
     @FXML private Label playTimeLabel;
     @FXML private Button playPauseButton;
 
+    private Player playerModel = new Player();
     private Stage playlistStage;
     private PlaylistController playlistController;
+
+    // TODO move to model-class
     private MediaPlayer mediaPlayer;
-    private AtomicBoolean isPlaying = new AtomicBoolean(false); // Do I need this?
+    private AtomicBoolean isPlaying = new AtomicBoolean(false);
 
     private Duration skipTime = new Duration(5000);
     private Duration zeroTime = new Duration(0);
@@ -53,7 +58,7 @@ public class PlayerController implements Initializable {
 
             playlistController = fxmlLoader.getController();
             if (null != playlistController) {
-                if (!playlistController.registerPlayerControllerAndStage(this, playlistStage)) {
+                if (!playlistController.registerPlayerControllerAndStageAndPlayerModel(this, playlistStage, playerModel)) {
                     System.out.println("registration of this PlayerController in playlistController did not succeed");
                 }
             } else {
@@ -82,10 +87,6 @@ public class PlayerController implements Initializable {
                 }
             });
         }
-    }
-
-    public void previous(ActionEvent actionEvent) {
-
     }
 
     private void playFile(Song song) {
@@ -151,8 +152,22 @@ public class PlayerController implements Initializable {
         }
     }
 
+    private void playFromPlaylist(int index) {
+        SongTableRepresentation nextSong = playerModel.items().get(index);
+        if (null != nextSong) {
+            playerModel.currentlyPlaying().set(index);
+            startPlayingFile(nextSong.song());
+        }
+    }
+
+    public void previous(ActionEvent actionEvent) {
+        int prevIndex = playerModel.currentlyPlaying().get() - 1;
+        if (prevIndex >= 0) { playFromPlaylist(prevIndex); }
+    }
+
     public void next(ActionEvent actionEvent) {
-        
+        int nextIndex = playerModel.currentlyPlaying().get() + 1;
+        if (playerModel.items().size() > nextIndex)  { playFromPlaylist(nextIndex); }
     }
 
     public void rewind(ActionEvent actionEvent) {
