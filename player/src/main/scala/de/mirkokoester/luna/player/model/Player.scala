@@ -10,10 +10,10 @@ import javafx.scene.media.{Media, MediaPlayer}
 import javafx.util.Duration
 
 class Player extends ObservablePlayer {
-  private val skipTime: Duration = new Duration(5000)
-  private val zeroTime: Duration = new Duration(0)
-  private var mediaPlayerOpt: Option[MediaPlayer] = None
-  private val isPlaying: AtomicBoolean = new AtomicBoolean(false)
+  private final val skipTime:  Duration = new Duration(5000)
+  private final val zeroTime:  Duration = new Duration(0)
+  private final val isPlaying: AtomicBoolean = new AtomicBoolean(false)
+  private var mediaPlayerOpt:  Option[MediaPlayer] = None
 
   val currentlyPlaying: SimpleIntegerProperty = new SimpleIntegerProperty
   val items: ObservableList[SongTableRepresentation] = FXCollections.observableArrayList(
@@ -25,13 +25,13 @@ class Player extends ObservablePlayer {
 
   def hasMediaPlayer(): Boolean = mediaPlayerOpt.nonEmpty
 
-  def getMedia(): Media              = mediaPlayerOpt.map(_.getMedia).getOrElse(null) // TODO remove nulls
-  def getCurrentTime(): Duration     = mediaPlayerOpt.map(_.getCurrentTime()).getOrElse(null)
-  def seek(seekTime: Duration): Unit = mediaPlayerOpt.foreach(_.seek(seekTime))
-  def setVolume(value: Double): Unit = mediaPlayerOpt.foreach(_.setVolume(value))
-  def getVolume(): Double            = mediaPlayerOpt.map(_.getVolume()).getOrElse(Double.NaN)
+  def getMedia(): Option[Media]          = mediaPlayerOpt.map(_.getMedia)
+  def getCurrentTime(): Option[Duration] = mediaPlayerOpt.map(_.getCurrentTime())
+  def seek(seekTime: Duration): Unit     = mediaPlayerOpt.foreach(_.seek(seekTime))
+  def setVolume(value: Double): Unit     = mediaPlayerOpt.foreach(_.setVolume(value)) // TODO make volume independent of media
+  def getVolume(): Double                = mediaPlayerOpt.map(_.getVolume()).getOrElse(Double.NaN)
 
-  private def playFile(song: Song) {
+  private def playFile(song: Song): Unit = {
     val file: File = new File(song.path)
     try {
       val media: Media = new Media(file.toURI.toURL.toString)
@@ -74,19 +74,19 @@ class Player extends ObservablePlayer {
     }
     catch {
       case e: MalformedURLException => {
-        e.printStackTrace
+        e.printStackTrace()
       }
     }
   }
 
   def startPlayingFile(song: Song): Unit = mediaPlayerOpt.fold(playFile(song)) { mediaPlayer =>
-    mediaPlayer.stop
-    mediaPlayer.dispose
+    mediaPlayer.stop()
+    mediaPlayer.dispose()
     playFile(song)
   }
 
   def playPause(): Unit = mediaPlayerOpt foreach { mediaPlayer =>
-    if (isPlaying.get) { mediaPlayer.pause } else { mediaPlayer.play }
+    if (isPlaying.get) { mediaPlayer.pause() } else { mediaPlayer.play() }
   }
 
   def stop(): Unit = mediaPlayerOpt.foreach(_.stop())
