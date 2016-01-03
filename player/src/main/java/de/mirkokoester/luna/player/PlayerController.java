@@ -1,6 +1,7 @@
 package de.mirkokoester.luna.player;
 
 import de.mirkokoester.luna.player.model.Player;
+import de.mirkokoester.luna.player.model.PlayerObserver;
 import de.mirkokoester.luna.player.model.Song;
 import de.mirkokoester.luna.player.model.SongTableRepresentation;
 import javafx.application.Platform;
@@ -14,18 +15,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-public class PlayerController implements Initializable {
+public class PlayerController implements Initializable, PlayerObserver {
     @FXML private Label playingTitle;
     @FXML private Slider volumeSlider;
     @FXML private Label volumeLabel;
@@ -37,18 +34,12 @@ public class PlayerController implements Initializable {
     private Stage playlistStage;
     private PlaylistController playlistController;
 
-    // TODO move to model-class
-    private MediaPlayer mediaPlayer;
-    private AtomicBoolean isPlaying = new AtomicBoolean(false);
-
-    private Duration skipTime = new Duration(5000);
-    private Duration zeroTime = new Duration(0);
-
     private static final String MEDIA_URL =
             "/home/mk/Music/Foo Fighters - In Your Honor   (CD2)/Foo Fighters - Cold Day In The Sun.mp3";
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        playerModel.register(this);
         FXMLLoader fxmlLoader = new FXMLLoader();
         try {
             Parent pl = fxmlLoader.load(getClass().getResource("playlist.fxml").openStream());
@@ -72,84 +63,39 @@ public class PlayerController implements Initializable {
             timeSlider.valueProperty().addListener(ov -> {
                 if (timeSlider.isValueChanging()) {
                     // multiply duration by percentage calculated by slider position
-                    Duration duration = mediaPlayer.getMedia().getDuration();
-                    mediaPlayer.seek(duration.multiply(timeSlider.getValue() / 100.0));
-                    updateValues();
+                    Media media = playerModel.getMedia();
+                    if (null != media) {
+                        Duration duration = media.getDuration();
+                        playerModel.seek(duration.multiply(timeSlider.getValue() / 100.0));
+                        updateValues();
+                    }
                 }
             });
         }
 
         if (null != volumeSlider) {
             volumeSlider.valueProperty().addListener(ov -> {
-                if (volumeSlider.isValueChanging() && null != mediaPlayer) {
-                    mediaPlayer.setVolume(volumeSlider.getValue() / 100.0);
+                if (volumeSlider.isValueChanging()) {
+                    playerModel.setVolume(volumeSlider.getValue() / 100.0);
                     updateValues();
                 }
             });
         }
     }
 
-    private void playFile(Song song) {
-        File file = new File(song.path());
-        try {
-            Media media = new Media(file.toURI().toURL().toString());
-            mediaPlayer = new MediaPlayer(media);
 
-            mediaPlayer.currentTimeProperty().addListener(ov -> {
-                updateValues();
-            });
-
-            mediaPlayer.setOnReady( () ->
-                    updateValues()
-            );
-            mediaPlayer.setOnPlaying( () -> {
-                playPauseButton.setText("\u2016");
-                isPlaying.set(true);
-            });
-            mediaPlayer.setOnPaused( () -> {
-                playPauseButton.setText("\u25B6");
-                isPlaying.set(false);
-            });
-            mediaPlayer.setOnStopped( () -> {
-                playPauseButton.setText("\u25B6");
-                isPlaying.set(false);
-            });
-
-            if (null != playingTitle) {
-                playingTitle.setText(song.getRepresentation());
-            }
-            mediaPlayer.play();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-    }
 
     protected void startPlayingFile(Song song) {
-        if (null == mediaPlayer) {
-            playFile(song);
-        } else {
-            mediaPlayer.stop();
-            mediaPlayer.dispose();
-            playFile(song);
-        }
+        // TODO remove
+        playerModel.startPlayingFile(song);
     }
 
     public void playPause(ActionEvent actionEvent) {
-        if (null == mediaPlayer) {
-            startPlayingFile(Song.fromPath(MEDIA_URL));
-        } else {
-            if (isPlaying.get()) {
-                mediaPlayer.pause();
-            } else {
-                mediaPlayer.play();
-            }
-        }
+        playerModel.playPause();
     }
 
     public void stop(ActionEvent actionEvent) {
-        if (null != mediaPlayer) {
-            mediaPlayer.stop();
-        }
+        playerModel.stop();
     }
 
     private void playFromPlaylist(int index) {
@@ -171,26 +117,11 @@ public class PlayerController implements Initializable {
     }
 
     public void rewind(ActionEvent actionEvent) {
-        if (null != mediaPlayer) {
-            Duration currentTime = mediaPlayer.getCurrentTime();
-            Duration seekTime = currentTime.subtract(skipTime);
-            if (!seekTime.greaterThanOrEqualTo(zeroTime)) {
-                seekTime = zeroTime;
-            }
-            mediaPlayer.seek(seekTime);
-        }
+        playerModel.rewind();
     }
 
     public void forward(ActionEvent actionEvent) {
-        if (null != mediaPlayer) {
-            Duration currentTime = mediaPlayer.getCurrentTime();
-            Duration duration = mediaPlayer.getMedia().getDuration();
-            Duration seekTime = currentTime.add(skipTime);
-            if (!seekTime.lessThan(duration)) {
-                seekTime = duration;
-            }
-            mediaPlayer.seek(seekTime);
-        }
+        playerModel.forward();
     }
 
     public void showPlaylist(ActionEvent actionEvent) {
@@ -203,15 +134,12 @@ public class PlayerController implements Initializable {
 
     }
 
-
-
-
-
-    protected void updateValues() {
-        if (playTimeLabel != null && timeSlider != null && volumeSlider != null) {
+    @Override
+    public void updateValues() {
+        if (playTimeLabel != null && timeSlider != null && volumeSlider != null && playerModel.hasMediaPlayer()) {
             Platform.runLater(() -> {
-                Duration currentTime = mediaPlayer.getCurrentTime();
-                Duration duration = mediaPlayer.getMedia().getDuration();
+                Duration currentTime = playerModel.getCurrentTime(); // FIXME
+                Duration duration = playerModel.getMedia().getDuration();
                 playTimeLabel.setText(formatTime(currentTime, duration));
                 timeSlider.setDisable(duration.isUnknown());
                 if (!timeSlider.isDisabled()
@@ -221,10 +149,10 @@ public class PlayerController implements Initializable {
                             * 100.0);
                 }
                 if (!volumeSlider.isValueChanging()) {
-                    volumeSlider.setValue((int)Math.round(mediaPlayer.getVolume()
+                    volumeSlider.setValue((int)Math.round(playerModel.getVolume()
                             * 100));
                 }
-                volumeLabel.setText( (int)Math.round(mediaPlayer.getVolume() * 100) + " %" );
+                volumeLabel.setText( (int)Math.round(playerModel.getVolume() * 100) + " %" );
             });
         }
     }
@@ -266,5 +194,32 @@ public class PlayerController implements Initializable {
                         elapsedSeconds);
             }
         }
+    }
+
+    @Override
+    public void setPlayingTitle(String title) {
+        if (null != playingTitle) {
+            playingTitle.setText(title);
+        }
+    }
+
+    @Override
+    public void onReady() {
+        updateValues();
+    }
+
+    @Override
+    public void onPlaying() {
+        playPauseButton.setText("\u2016");
+    }
+
+    @Override
+    public void onPaused() {
+        playPauseButton.setText("\u25B6");
+    }
+
+    @Override
+    public void onStopped() {
+        playPauseButton.setText("\u25B6");
     }
 }
