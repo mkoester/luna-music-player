@@ -123,10 +123,6 @@ class PlayerController extends Initializable with PlayerObserver {
     }
   }
 
-  protected def startPlayingFile(song: Song) {
-    playerModel.startPlayingFile(song)
-  }
-
   def playPause(actionEvent: ActionEvent) {
     playerModel.playPause()
   }
@@ -135,46 +131,36 @@ class PlayerController extends Initializable with PlayerObserver {
     playerModel.stop()
   }
 
-  private def playFromPlaylist(index: Int) {
-    val nextSong: SongTableRepresentation = playerModel.items.get(index)
-    if (null != nextSong) {
-      playerModel.currentlyPlaying.set(index)
-      startPlayingFile(nextSong.song)
-    }
+  private def playFromPlaylist(index: Int): Unit = {
+    playerModel.startPlayingFileFromPlaylist(index)
   }
 
-  def previous(actionEvent: ActionEvent) {
-    val prevIndex: Int = playerModel.currentlyPlaying.get - 1
-    if (prevIndex >= 0) {
-      playFromPlaylist(prevIndex)
-    }
+  def previous(actionEvent: ActionEvent): Unit = {
+    playerModel.playPreviousFromPlaylist()
   }
 
-  def next(actionEvent: ActionEvent) {
-    val nextIndex: Int = playerModel.currentlyPlaying.get + 1
-    if (playerModel.items.size > nextIndex) {
-      playFromPlaylist(nextIndex)
-    }
+  def next(actionEvent: ActionEvent): Unit = {
+    playerModel.playNextFromPlaylist()
   }
 
-  def rewind(actionEvent: ActionEvent) {
+  def rewind(actionEvent: ActionEvent): Unit = {
     playerModel.rewind()
   }
 
-  def forward(actionEvent: ActionEvent) {
+  def forward(actionEvent: ActionEvent): Unit = {
     playerModel.forward()
   }
 
-  def showPlaylist(actionEvent: ActionEvent) {
+  def showPlaylist(actionEvent: ActionEvent): Unit = {
     if (null != playlistStage) {
       playlistStage.show()
     }
   }
 
-  def showMediaLibrary(actionEvent: ActionEvent) {
+  def showMediaLibrary(actionEvent: ActionEvent): Unit = {
   }
 
-  def updateValues {
+  def updateValues(): Unit = {
     if (playTimeLabel != null && timeSlider != null && volumeSlider != null && playerModel.hasMediaPlayer) {
       Platform.runLater(new Runnable() {
         override def run(): Unit = {
@@ -207,19 +193,19 @@ class PlayerController extends Initializable with PlayerObserver {
     }
   }
 
-  def onReady {
+  def onReady(): Unit = {
     updateValues
   }
 
-  def onPlaying {
+  def onPlaying(): Unit = {
     playPauseButton.setText("\u2016")
   }
 
-  def onPaused {
+  def onPaused(): Unit = {
     playPauseButton.setText("\u25B6")
   }
 
-  def onStopped {
+  def onStopped(): Unit = {
     playPauseButton.setText("\u25B6")
   }
 }

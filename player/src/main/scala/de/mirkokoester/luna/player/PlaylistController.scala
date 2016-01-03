@@ -62,8 +62,7 @@ class PlaylistController extends Initializable {
           currentItemSelectedOpt foreach { currentItemSelected =>
             val index = playerModel.items.indexOf(currentItemSelected)
             if (index >= 0) {
-              playerModel.currentlyPlaying.set(index)
-              playerModel.startPlayingFile(currentItemSelected.song)
+              playerModel.startPlayingFileFromPlaylist(index)
             }
           }
         }

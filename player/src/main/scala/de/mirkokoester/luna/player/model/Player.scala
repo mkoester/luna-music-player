@@ -15,7 +15,7 @@ class Player extends ObservablePlayer {
   private final val isPlaying: AtomicBoolean = new AtomicBoolean(false)
   private var mediaPlayerOpt:  Option[MediaPlayer] = None
 
-  val currentlyPlaying: SimpleIntegerProperty = new SimpleIntegerProperty
+  private final val currentlyPlaying: SimpleIntegerProperty = new SimpleIntegerProperty
   val items: ObservableList[SongTableRepresentation] = FXCollections.observableArrayList(
     new SongTableRepresentation(Song.fromPath("/home/mk/Music/Foo Fighters - In Your Honor   (CD2)/Foo Fighters - Cold Day In The Sun.mp3")),
     new SongTableRepresentation(Song.fromPath("/home/mk/Music/Dido - Life For Rent/Dido - White Flag.mp3")),
@@ -79,10 +79,32 @@ class Player extends ObservablePlayer {
     }
   }
 
-  def startPlayingFile(song: Song): Unit = mediaPlayerOpt.fold(playFile(song)) { mediaPlayer =>
+  private def startPlayingFile(song: Song): Unit = mediaPlayerOpt.fold(playFile(song)) { mediaPlayer =>
     mediaPlayer.stop()
     mediaPlayer.dispose()
     playFile(song)
+  }
+
+  def startPlayingFileFromPlaylist(index: Int): Unit = {
+    if (index >= 0 && index < items.size()) {
+      currentlyPlaying.set(index)
+      val song = items.get(index).song
+      startPlayingFile(song)
+    }
+  }
+
+  def playPreviousFromPlaylist(): Unit = {
+    val prevIndex: Int = currentlyPlaying.get - 1
+    if (prevIndex >= 0) {
+      startPlayingFileFromPlaylist(prevIndex)
+    }
+  }
+
+  def playNextFromPlaylist(): Unit = {
+    val nextIndex: Int = currentlyPlaying.get + 1
+    if (items.size > nextIndex) {
+      startPlayingFileFromPlaylist(nextIndex)
+    }
   }
 
   def playPause(): Unit = mediaPlayerOpt foreach { mediaPlayer =>
