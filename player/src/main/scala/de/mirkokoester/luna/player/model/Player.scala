@@ -15,8 +15,8 @@ class Player extends ObservablePlayer {
   private final val isPlaying: AtomicBoolean = new AtomicBoolean(false)
   private var mediaPlayerOpt:  Option[MediaPlayer] = None
 
-  private final val currentlyPlaying: SimpleIntegerProperty = new SimpleIntegerProperty
-  val items: ObservableList[SongTableRepresentation] = FXCollections.observableArrayList(
+  private final val currentlyPlaying: SimpleIntegerProperty = new SimpleIntegerProperty(-1)
+  val items: ObservableList[SongTableRepresentation] = FXCollections.observableArrayList( // TODO do not expose
     new SongTableRepresentation(Song.fromPath("/home/mk/Music/Foo Fighters - In Your Honor   (CD2)/Foo Fighters - Cold Day In The Sun.mp3")),
     new SongTableRepresentation(Song.fromPath("/home/mk/Music/Dido - Life For Rent/Dido - White Flag.mp3")),
     new SongTableRepresentation(Song.fromPath("/home/mk/Music/Intergalactic Lovers - Little Heavy Burdens/Intergalactic Lovers - No Regrets.mp3")),
@@ -25,6 +25,7 @@ class Player extends ObservablePlayer {
 
   def hasMediaPlayer(): Boolean = mediaPlayerOpt.nonEmpty
 
+  def getCurrentlyPlaying = currentlyPlaying.get()
   def getMedia(): Option[Media]          = mediaPlayerOpt.map(_.getMedia)
   def getCurrentTime(): Option[Duration] = mediaPlayerOpt.map(_.getCurrentTime())
   def seek(seekTime: Duration): Unit     = mediaPlayerOpt.foreach(_.seek(seekTime))
@@ -132,4 +133,7 @@ class Player extends ObservablePlayer {
     mediaPlayer.seek(seekTime)
   }
 
+  def registerListenerToCurrentlyPlayingTrackFromPlaylist(listener: InvalidationListener): Unit = {
+    currentlyPlaying.addListener(listener)
+  }
 }

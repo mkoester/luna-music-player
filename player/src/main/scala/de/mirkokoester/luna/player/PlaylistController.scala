@@ -1,5 +1,7 @@
 package de.mirkokoester.luna.player
 
+import javafx.beans.{Observable, InvalidationListener}
+import javafx.scene.Node
 import javafx.scene.input.MouseEvent
 
 import de.mirkokoester.luna.player.model.Player
@@ -10,9 +12,7 @@ import javafx.beans.value.ObservableValue
 import javafx.event.{EventHandler, ActionEvent}
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
-import javafx.scene.control.TableCell
-import javafx.scene.control.TableColumn
-import javafx.scene.control.TableView
+import javafx.scene.control.{TableRow, TableCell, TableColumn, TableView}
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.stage.FileChooser
 import javafx.stage.Stage
@@ -20,6 +20,8 @@ import javafx.util.Callback
 import java.io.File
 import java.net.URL
 import java.util.ResourceBundle
+
+import scala.collection.JavaConverters._
 
 class PlaylistController extends Initializable {
   @FXML protected var playlistTableView: TableView[SongTableRepresentation] = null
@@ -74,8 +76,30 @@ class PlaylistController extends Initializable {
     if (null == this.playerController && null == this.playlistStage && null == this.playerModel) {
       this.playerController = playerController
       this.playlistStage = playlistStage
+      playlistStage.getScene().getStylesheets().add(getClass().getResource("playlist.css").toExternalForm())
       this.playerModel = playerModel
       playlistTableView.setItems(this.playerModel.items)
+
+      playerModel.registerListenerToCurrentlyPlayingTrackFromPlaylist(new InvalidationListener() {
+        override def invalidated(observable: Observable): Unit = {
+          var currentRow = 0;
+          val currentlyPlaying = playerModel.getCurrentlyPlaying
+          for (node: Node <- playlistTableView.lookupAll("TableRow").asScala) {
+            node match {
+              case row: TableRow[_] =>
+                if (currentRow == currentlyPlaying) {
+                  row.getStyleClass().add("currentlyPlaying")
+                } else {
+                  row.getStyleClass().remove("currentlyPlaying")
+                }
+                currentRow = currentRow + 1
+
+              case _ =>
+            }
+          }
+        }
+      })
+
       true
     }
     else {
