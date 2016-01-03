@@ -1,14 +1,14 @@
 lazy val commonSettings = Seq(
   organization := "de.mirkokoester",
   version := "0.1.0-SNAPSHOT",
-  scalaVersion := "2.11.7",
-  resolvers += Resolver.bintrayRepo("ijabz", "maven") //jaudiotagger repo
+  scalaVersion := "2.11.7"
 )
 
 lazy val core = (project in file("core")).
   settings(commonSettings: _*).
   settings(
     name := "luna-core",
+    resolvers += Resolver.bintrayRepo("ijabz", "maven"), //jaudiotagger repo
     libraryDependencies ++= Seq(
       "net.jthink"              % "jaudiotagger"        % "2.2.5"
     )
