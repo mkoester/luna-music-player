@@ -2,5 +2,6 @@ package de.mirkokoester.luna.model
 
 
 trait Playlist {
-  def addToPlaylist(song: Song)
+  def clearPlaylist(): Unit
+  def addToPlaylist(song: Song): Unit
 }

@@ -28,7 +28,7 @@
    </top>
    <bottom>
        <HBox prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-           <Button mnemonicParsing="false" text="&#x25B6;" onAction="#play" />
+           <Button mnemonicParsing="false" text="&#x2421;" onAction="#clearPlaylist" />
        </HBox>
    </bottom>
    <center>

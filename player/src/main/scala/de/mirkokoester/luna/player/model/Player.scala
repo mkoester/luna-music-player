@@ -148,6 +148,11 @@ class Player extends ObservablePlayer with Playlist {
     currentlyPlaying.addListener(listener)
   }
 
+  override def clearPlaylist(): Unit = {
+    currentlyPlaying.set(-1)
+    items.clear()
+  }
+
   override def addToPlaylist(song: Song): Unit = {
     items.add(SongTableRepresentation(song))
   }

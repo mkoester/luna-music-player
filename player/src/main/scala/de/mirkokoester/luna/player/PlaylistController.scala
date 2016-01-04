@@ -107,17 +107,12 @@ class PlaylistController extends Initializable {
     }
   }
 
-  def play(actionEvent: ActionEvent) {
-    if (null != playerController) {
-      playerController.playPause(null)
-    }
-    else {
-      System.out.println("no playerController")
-    }
-  }
-
   def close(actionEvent: ActionEvent) {
     playlistStage.hide()
+  }
+
+  def clearPlaylist(actionEvent: ActionEvent) {
+    playerModel.clearPlaylist()
   }
 
   def addFile(actionEvent: ActionEvent) {
