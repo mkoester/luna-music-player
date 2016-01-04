@@ -72,6 +72,15 @@ class Player extends ObservablePlayer with Playlist {
         }
       })
 
+      mediaPlayer.setOnEndOfMedia(new Runnable {
+        override def run(): Unit = {
+          mediaPlayer.stop()
+          mediaPlayer.seek(zeroTime)
+          isPlaying.set(false)
+          playNextFromPlaylist()
+        }
+      })
+
       observers.foreach(_.setPlayingTitle(song.getRepresentation))
       mediaPlayer.play()
     }
