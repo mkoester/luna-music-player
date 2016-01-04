@@ -14,15 +14,6 @@ lazy val core = (project in file("core")).
     )
   )
 
-lazy val player = (project in file("player")).
-  settings(commonSettings: _*).
-  settings(
-    name := "luna-player",
-    libraryDependencies ++= Seq(
-    )
-  ).
-  dependsOn(core)
-
 lazy val mediaLibrary = (project in file("media-library")).
   settings(commonSettings: _*).
   settings(
@@ -30,10 +21,20 @@ lazy val mediaLibrary = (project in file("media-library")).
     libraryDependencies ++= Seq(
       "com.typesafe.akka"       %% "akka-actor"         % "2.4.1",
       "com.typesafe.slick"      %% "slick"              % "3.1.1",
+      "com.h2database"          %  "h2"                 % "1.4.190",
       "ch.qos.logback"          %  "logback-classic"    % "1.1.3"
     )
   ).
   dependsOn(core)
+
+lazy val player = (project in file("player")).
+  settings(commonSettings: _*).
+  settings(
+    name := "luna-player",
+    libraryDependencies ++= Seq(
+    )
+  ).
+  dependsOn(core, mediaLibrary)
 
 lazy val root = (project in file(".")).
   settings(commonSettings: _*).
@@ -42,4 +43,4 @@ lazy val root = (project in file(".")).
     libraryDependencies ++= Seq(
     )
   )
-  .dependsOn(player)
+  .dependsOn(player, mediaLibrary)

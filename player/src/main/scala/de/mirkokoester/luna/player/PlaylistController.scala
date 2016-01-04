@@ -4,8 +4,8 @@ import javafx.beans.{Observable, InvalidationListener}
 import javafx.scene.Node
 import javafx.scene.input.MouseEvent
 
+import de.mirkokoester.luna.model.Song
 import de.mirkokoester.luna.player.model.Player
-import de.mirkokoester.luna.player.model.Song
 import de.mirkokoester.luna.player.model.SongTableRepresentation
 import javafx.beans.property.ReadOnlyObjectWrapper
 import javafx.beans.value.ObservableValue

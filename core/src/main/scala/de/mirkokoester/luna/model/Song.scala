@@ -1,4 +1,4 @@
-package de.mirkokoester.luna.player.model
+package de.mirkokoester.luna.model
 
 import java.io.File
 
@@ -7,7 +7,7 @@ import org.jaudiotagger.tag.FieldKey
 
 import scala.util.control.NonFatal
 
-case class Song(path: String, albumArtist: Option[String], artist: Option[String],
+final case class Song(path: String, albumArtist: Option[String], artist: Option[String],
                 title: Option[String], composer: Option[String], album: Option[String], discNo: Option[Int],
                 discTotal: Option[Int], genre: Option[String], comment: Option[String], language: Option[String],
                 track: Option[Int], trackTotal: Option[Int], year: Option[Int], duration: Int, idOpt: Option[Int] = None) {
@@ -57,13 +57,4 @@ object Song {
       duration
     )
   }
-}
-
-class SongTableRepresentation(val song: Song) {
-  def getTitle: String = song.getRepresentation
-  def getDuration: String = song.duration.toString
-}
-
-object SongTableRepresentation {
-  def apply(song: Song) = new SongTableRepresentation(song)
 }

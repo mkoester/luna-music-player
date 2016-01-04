@@ -2,9 +2,9 @@ package de.mirkokoester.luna.player
 
 import javafx.beans.{Observable, InvalidationListener}
 
+import de.mirkokoester.luna.medialibrary.MedialibraryController
 import de.mirkokoester.luna.player.model.Player
 import de.mirkokoester.luna.player.model.PlayerObserver
-import de.mirkokoester.luna.player.model.Song
 import de.mirkokoester.luna.player.model.SongTableRepresentation
 import javafx.application.Platform
 import javafx.event.ActionEvent
@@ -23,6 +23,8 @@ import java.net.URL
 import java.util.ResourceBundle
 
 import scala.math
+import scala.util.control.NonFatal
+import scala.util.{Failure, Success}
 
 object PlayerController {
   private def toTwoDigits(number: Int): String = if (number > 9) number.toString else s"0$number"
@@ -65,15 +67,17 @@ object PlayerController {
 }
 
 class PlayerController extends Initializable with PlayerObserver {
-  @FXML protected var playingTitle: Label = null
-  @FXML protected var volumeSlider: Slider = null
-  @FXML protected var volumeLabel: Label = null
-  @FXML protected var timeSlider: Slider = null
-  @FXML protected var playTimeLabel: Label = null
+  @FXML protected var playingTitle:    Label = null
+  @FXML protected var volumeSlider:    Slider = null
+  @FXML protected var volumeLabel:     Label = null
+  @FXML protected var timeSlider:      Slider = null
+  @FXML protected var playTimeLabel:   Label = null
   @FXML protected var playPauseButton: Button = null
-  private val playerModel: Player = new Player
-  private var playlistStage: Stage = null
-  private var playlistController: PlaylistController = null
+  private val playerModel:            Player = new Player
+  private var playlistStage:          Stage = null
+  private var playlistController:     PlaylistController = null
+  private var medialibraryStage:      Stage = null
+  private var medialibraryController: MedialibraryController = null
 
   def initialize(location: URL, resources: ResourceBundle) {
     playerModel.register(this)
@@ -88,8 +92,7 @@ class PlayerController extends Initializable with PlayerObserver {
         if (!playlistController.registerPlayerControllerAndStageAndPlayerModel(this, playlistStage, playerModel)) {
           System.out.println("registration of this PlayerController in playlistController did not succeed")
         }
-      }
-      else {
+      } else {
         System.out.println("no playlistController")
       }
     }
@@ -97,6 +100,12 @@ class PlayerController extends Initializable with PlayerObserver {
       case e: IOException => {
         e.printStackTrace
       }
+    }
+    MedialibraryController.getStageAndController() match {
+      case Success((medialibraryStage, medialibraryController)) =>
+        this.medialibraryStage = medialibraryStage
+        this.medialibraryController = medialibraryController
+      case Failure(NonFatal(e)) => e.printStackTrace
     }
     if (null != timeSlider) {
       timeSlider.valueProperty.addListener(new InvalidationListener() {
@@ -158,6 +167,9 @@ class PlayerController extends Initializable with PlayerObserver {
   }
 
   def showMediaLibrary(actionEvent: ActionEvent): Unit = {
+    if (null != medialibraryStage) {
+      medialibraryStage.show()
+    }
   }
 
   def updateValues(): Unit = {

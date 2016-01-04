@@ -9,6 +9,8 @@ import javafx.collections.{ObservableList, FXCollections}
 import javafx.scene.media.{Media, MediaPlayer}
 import javafx.util.Duration
 
+import de.mirkokoester.luna.model.Song
+
 class Player extends ObservablePlayer {
   private final val skipTime:  Duration = new Duration(5000)
   private final val zeroTime:  Duration = new Duration(0)
