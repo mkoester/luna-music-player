@@ -3,14 +3,15 @@ package de.mirkokoester.luna.medialibrary
 import java.net.URL
 import java.util.ResourceBundle
 import javafx.collections.{FXCollections, ObservableList}
-import javafx.event.ActionEvent
+import javafx.event.{EventHandler, ActionEvent}
 import javafx.fxml.{FXMLLoader, FXML, Initializable}
 import javafx.scene.control.cell.PropertyValueFactory
+import javafx.scene.input.MouseEvent
 import javafx.scene.{Scene, Parent}
 import javafx.scene.control.{TableColumn, TableView}
 import javafx.stage.Stage
 
-import de.mirkokoester.luna.model.SongMedialibraryTabelRepresentation
+import de.mirkokoester.luna.model.{Playlist, SongMedialibraryTabelRepresentation}
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.control.NonFatal
@@ -19,6 +20,7 @@ import scala.util.{Failure, Success, Try}
 class MedialibraryController extends Initializable {
   @FXML protected var medialibraryTableView: TableView[SongMedialibraryTabelRepresentation] = null
   val items: ObservableList[SongMedialibraryTabelRepresentation] = FXCollections.observableArrayList()
+  private var playlist: Playlist = null
   implicit val ec: ExecutionContextExecutor = scala.concurrent.ExecutionContext.Implicits.global // TODO get during initialization
 
   override def initialize(location: URL, resources: ResourceBundle): Unit = {
@@ -45,12 +47,32 @@ class MedialibraryController extends Initializable {
       commentCol.setCellValueFactory(new PropertyValueFactory[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]("comment"))
     }
 
+    medialibraryTableView.setOnMouseClicked(new EventHandler[MouseEvent] {
+      override def handle(event: MouseEvent): Unit = {
+        if (event.getClickCount == 2) {
+          val currentItemSelectedOpt = Option(medialibraryTableView.getSelectionModel().getSelectedItem())
+          currentItemSelectedOpt foreach { currentItemSelected =>
+            playlist.addToPlaylist(currentItemSelected.song)
+          }
+        }
+      }
+    })
+
     LibraryH2DB.queryAllSongs().foreach { song =>
       items.add(SongMedialibraryTabelRepresentation(song))
     } onComplete {
       case Success(_) => println(s"MedialibraryController: added all songs, #songs in list: ${items.size()}")
       case Failure(NonFatal(e)) => println(s"MedialibraryController: failure adding songs, ${e.getMessage}")
         e.printStackTrace()
+    }
+  }
+
+  def registerPlaylist(playlist: Playlist): Boolean = {
+    if (null == this.playlist) {
+      this.playlist = playlist
+      true
+    } else {
+      false
     }
   }
 

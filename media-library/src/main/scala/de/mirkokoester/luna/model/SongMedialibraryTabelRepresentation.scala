@@ -1,6 +1,6 @@
 package de.mirkokoester.luna.model
 
-class SongMedialibraryTabelRepresentation(song: Song) {
+class SongMedialibraryTabelRepresentation(val song: Song) {
   import song._
   def getPath:        String  = path
   def getAlbumArtist: String  = albumArtist.getOrElse("")

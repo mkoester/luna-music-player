@@ -9,9 +9,9 @@ import javafx.collections.{ObservableList, FXCollections}
 import javafx.scene.media.{Media, MediaPlayer}
 import javafx.util.Duration
 
-import de.mirkokoester.luna.model.Song
+import de.mirkokoester.luna.model.{Playlist, Song}
 
-class Player extends ObservablePlayer {
+class Player extends ObservablePlayer with Playlist {
   private final val skipTime:  Duration = new Duration(5000)
   private final val zeroTime:  Duration = new Duration(0)
   private final val isPlaying: AtomicBoolean = new AtomicBoolean(false)
@@ -137,5 +137,9 @@ class Player extends ObservablePlayer {
 
   def registerListenerToCurrentlyPlayingTrackFromPlaylist(listener: InvalidationListener): Unit = {
     currentlyPlaying.addListener(listener)
+  }
+
+  override def addToPlaylist(song: Song): Unit = {
+    items.add(SongTableRepresentation(song))
   }
 }

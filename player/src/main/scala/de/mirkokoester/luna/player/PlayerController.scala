@@ -101,12 +101,17 @@ class PlayerController extends Initializable with PlayerObserver {
         e.printStackTrace
       }
     }
+
     MedialibraryController.getStageAndController() match {
       case Success((medialibraryStage, medialibraryController)) =>
         this.medialibraryStage = medialibraryStage
         this.medialibraryController = medialibraryController
+        if (!medialibraryController.registerPlaylist(playerModel)) {
+          System.out.println("registration of the playlist in medialibraryController did not succeed")
+        }
       case Failure(NonFatal(e)) => e.printStackTrace
     }
+
     if (null != timeSlider) {
       timeSlider.valueProperty.addListener(new InvalidationListener() {
         override def invalidated(observable: Observable): Unit = {

@@ -8,7 +8,6 @@ import javafx.scene.{Parent, Scene}
 import javafx.stage.{Stage, WindowEvent}
 
 import de.mirkokoester.luna.medialibrary.{FileWalker, LibraryH2DB}
-import de.mirkokoester.luna.model.Song
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.control.NonFatal
