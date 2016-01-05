@@ -28,15 +28,17 @@ class MedialibraryController extends Initializable {
       medialibraryTableView.setItems(items)
 
       // TODO make it configurable which columns should be shown
-      val albumArtistCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation] = new TableColumn("albumArtist")
-      val artistCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation] = new TableColumn("artist")
-      val titleCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation] = new TableColumn("title")
-      val durationCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation] = new TableColumn("duration")
-      val trackCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation] = new TableColumn("track")
-      val yearCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation] = new TableColumn("year")
-      val albumCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation] = new TableColumn("album")
-      val commentCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation] = new TableColumn("comment")
-      medialibraryTableView.getColumns.addAll(albumArtistCol, artistCol, titleCol, durationCol, trackCol, yearCol, albumCol, commentCol)
+      val albumArtistCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation] = new TableColumn("album artist")
+      val artistCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]      = new TableColumn("artist")
+      val titleCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]       = new TableColumn("title")
+      val durationCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]    = new TableColumn("duration")
+      val trackCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]       = new TableColumn("track")
+      val yearCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]        = new TableColumn("year")
+      val albumCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]       = new TableColumn("album")
+      val commentCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]     = new TableColumn("comment")
+      val ratingCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]      = new TableColumn("rating")
+      val ratingStarCol: TableColumn[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]  = new TableColumn("stars")
+      medialibraryTableView.getColumns.addAll(albumArtistCol, artistCol, titleCol, durationCol, trackCol, yearCol, albumCol, commentCol, ratingCol, ratingStarCol)
       albumArtistCol.setCellValueFactory(new PropertyValueFactory[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]("albumArtist"))
       artistCol.setCellValueFactory(new PropertyValueFactory[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]("artist"))
       titleCol.setCellValueFactory(new PropertyValueFactory[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]("title"))
@@ -45,6 +47,9 @@ class MedialibraryController extends Initializable {
       yearCol.setCellValueFactory(new PropertyValueFactory[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]("year"))
       albumCol.setCellValueFactory(new PropertyValueFactory[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]("album"))
       commentCol.setCellValueFactory(new PropertyValueFactory[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]("comment"))
+      ratingCol.setCellValueFactory(new PropertyValueFactory[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]("rating"))
+      ratingStarCol.setCellValueFactory(new PropertyValueFactory[SongMedialibraryTabelRepresentation, SongMedialibraryTabelRepresentation]("ratingStar"))
+      ratingStarCol.setSortable(false)
     }
 
     medialibraryTableView.setOnMouseClicked(new EventHandler[MouseEvent] {
